@@ -35,10 +35,27 @@ function mostrarSugerencias(res) {
 }
 
 async function ejecutarBusqueda(query) {
+    if (!query) return;
     mostrarVista('explore');
-    const res = await fetch(`${BASE_URL}/search/multi?api_key=${API_KEY}&language=es-ES&query=${encodeURIComponent(query)}`);
-    const data = await res.json();
-    pintarPeliculas(data.results.filter(i => i.media_type === 'movie' || i.media_type === 'tv'));
+    
+    // Cambiamos a search/multi y forzamos el idioma y que incluya adultos (por si acaso)
+    const url = `${BASE_URL}/search/multi?api_key=${API_KEY}&language=es-ES&query=${encodeURIComponent(query)}&include_adult=false`;
+    
+    try {
+        const res = await fetch(url);
+        const data = await res.json();
+        
+        // Filtramos resultados para solo mostrar cine o TV
+        const resultados = data.results.filter(i => i.media_type === 'movie' || i.media_type === 'tv');
+        
+        if (resultados.length === 0) {
+            document.getElementById('results-container').innerHTML = '<h3>No hemos encontrado nada con ese nombre</h3>';
+        } else {
+            pintarPeliculas(resultados);
+        }
+    } catch (error) {
+        console.error("Error en la búsqueda:", error);
+    }
 }
 
 async function cargarHero() {
