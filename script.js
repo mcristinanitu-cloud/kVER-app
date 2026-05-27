@@ -51,16 +51,16 @@ document.querySelectorAll('.btn-volver').forEach(btn => btn.addEventListener('cl
 async function cargarTopGlobal() {
     mostrarVistaExplorador("Top Global (Tendencias)");
     try {
-        const res = await fetch(`${BASE_URL}/trending/all/day?api_key=${API_KEY}&language=es-ES`);
+        // Prueba cambiando 'all' por 'movie' para descartar que sea el endpoint
+        const res = await fetch(`${BASE_URL}/trending/movie/day?api_key=${API_KEY}&language=es-ES`);
         const data = await res.json();
         
-        console.log("Datos crudos:", data.results); // <--- MIRA LA CONSOLA (F12)
+        console.log("Respuesta de API:", data);
         
         const resultadosFiltrados = limpiarResultados(data.results);
-        console.log("Después de limpiar:", resultadosFiltrados); // <--- MIRA LA CONSOLA
-        
         pintarResultados(resultadosFiltrados.slice(0, 10), true); 
     } catch (error) {
+        console.error(error);
         mostrarError();
     }
 }
@@ -161,14 +161,17 @@ function pintarResultados(items, mostrarMedallaTop = false) {
 }
 
 function limpiarResultados(items) {
-    // 1. Eliminamos el filtro estricto de idiomas (o hazlo más permisivo)
-    // 2. Nos aseguramos de que el elemento tenga al menos un título y un póster
     return items.filter(item => {
-        const esValido = (item.media_type === 'movie' || item.media_type === 'tv');
+        // Aseguramos que tenga nombre/título
         const tieneTitulo = item.title || item.name;
         
-        // Si quieres filtrar idiomas, hazlo de forma opcional o mucho más amplia
-        // const idiomaValido = ['es', 'en', 'fr', 'it', 'de', 'pt'].includes(item.original_language);
+        // Si no tiene media_type, intentamos deducirlo
+        if (!item.media_type) {
+            item.media_type = item.title ? 'movie' : 'tv';
+        }
+
+        // Solo validamos que sea película o serie y tenga título
+        const esValido = (item.media_type === 'movie' || item.media_type === 'tv');
         
         return esValido && tieneTitulo;
     });
