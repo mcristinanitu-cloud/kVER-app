@@ -20,6 +20,11 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // 3. NAVEGACIÓN SPA
+
+function mostrarError() {
+    resultsContainer.innerHTML = '<div class="empty-state"><h3>Error de conexión.</h3></div>';
+}
+
 function mostrarVistaPrincipal() {
     heroSection.classList.remove('hidden');
     randomSection.classList.add('hidden');
@@ -162,8 +167,11 @@ async function ejecutarBusqueda() {
 // 5. RENDERIZADO Y FILTROS
 // 5. RENDERIZADO Y FILTROS
 // MODIFICACIÓN: Ahora recibe el tipo para saber dónde pintar
+// 5. RENDERIZADO Y FILTROS
 function pintarResultados(items, mostrarMedallaTop = false, tipoPintar = 'movie') {
     const contenedor = document.getElementById(`results-${tipoPintar}`);
+    if (!contenedor) return; // Seguridad extra
+    
     contenedor.innerHTML = ''; 
     
     if (items.length === 0) {
@@ -193,17 +201,30 @@ function pintarResultados(items, mostrarMedallaTop = false, tipoPintar = 'movie'
             </div>
         `;
         contenedor.appendChild(card);
-    }); // <--- ¡ESTA LLAVE CERRABA EL FOREACH!
-}
+    }); 
+} // <--- ¡AQUÍ CERRAMOS PINTARRESULTADOS!
 
 function limpiarResultados(items) {
+    if (!items) return [];
     return items.filter(item => {
         const tieneTitulo = item.title || item.name;
         if (!item.media_type) {
             item.media_type = item.title ? 'movie' : 'tv';
         }
-        const esValido = (item.media_type === 'movie' || item.media_type === 'tv');
-        return esValido && tieneTitulo;
+        return tieneTitulo;
+    });
+}
+
+function limpiarResultados(items) {
+    if (!items) return [];
+    return items.filter(item => {
+        // Aseguramos que tenga título
+        const tieneTitulo = item.title || item.name;
+        // Asignamos tipo si falta
+        if (!item.media_type) {
+            item.media_type = item.title ? 'movie' : 'tv';
+        }
+        return tieneTitulo; // Quitamos el filtro estricto de esValido para ver qué llega
     });
 }
 
