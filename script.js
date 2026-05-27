@@ -116,10 +116,10 @@ async function cargarHero() {
 
 async function cargarPorPlataforma(providerId) {
     try {
+        // Obtenemos los datos
         const res = await fetch(`${BASE_URL}/discover/movie?api_key=${API_KEY}&language=es-ES&watch_region=ES&with_watch_providers=${providerId}&sort_by=popularity.desc`);
         const data = await res.json();
         
-        // Forzamos el media_type: 'movie' antes de limpiar
         const itemsConTipo = data.results.map(i => ({...i, media_type: 'movie'}));
         const resultadosFiltrados = limpiarResultados(itemsConTipo);
         
@@ -142,6 +142,7 @@ async function ejecutarBusqueda() {
 }
 
 // 5. RENDERIZADO Y FILTROS
+// 5. RENDERIZADO Y FILTROS
 function pintarResultados(items, mostrarMedallaTop = false) {
     resultsContainer.innerHTML = ''; 
     if (items.length === 0) {
@@ -156,12 +157,12 @@ function pintarResultados(items, mostrarMedallaTop = false) {
         
         const card = document.createElement('div');
         card.classList.add('movie-card');
-        // Añadimos cursor pointer para indicar que es clicable
         card.style.cursor = 'pointer'; 
         
-        // Evento de clic: redirige a la web de TMDB con el tipo e ID correctos
+        // CORRECCIÓN: Evento de clic único y bien posicionado
         card.addEventListener('click', () => {
-            const url = `https://www.themoviedb.org/${item.media_type}/${item.id}`;
+            const tipoUrl = item.media_type || 'movie'; 
+            const url = `https://www.themoviedb.org/${tipoUrl}/${item.id}`;
             window.open(url, '_blank');
         });
 
@@ -176,6 +177,8 @@ function pintarResultados(items, mostrarMedallaTop = false) {
         resultsContainer.appendChild(card);
     });
 }
+
+
 function limpiarResultados(items) {
     return items.filter(item => {
         // Aseguramos que tenga nombre/título
@@ -192,6 +195,20 @@ function limpiarResultados(items) {
         return esValido && tieneTitulo;
     });
 }
+
+const botonesPlataformas = document.querySelectorAll('.btn-platform');
+botonesPlataformas.forEach(boton => {
+    boton.addEventListener('click', (e) => {
+        const id = e.target.getAttribute('data-id');
+        const nombre = e.target.getAttribute('data-name');
+        
+        // Ignoramos el botón de Top Global porque ese tiene su propio evento
+        if (id) {
+            mostrarVistaExplorador(`Top 10 en ${nombre}`);
+            cargarPorPlataforma(id);
+        }
+    });
+});
 
 // Eventos finales
 document.getElementById('btn-top-global').addEventListener('click', cargarTopGlobal);
