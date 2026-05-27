@@ -9,7 +9,7 @@
 </head>
 <body>
 
-  <header id="main-header">
+    <header id="main-header">
         <div class="logo-container" id="logo" style="cursor: pointer;">
             <h1>kVER <span>España</span></h1>
         </div>
@@ -24,18 +24,15 @@
     </header>
 
     <main>
-        <nav class="selectors" aria-label="Selector de plataformas de streaming">
+        <nav class="selectors" aria-label="Selector de plataformas">
             <div class="platform-buttons">
                 <button class="btn-platform" data-id="8" data-name="Netflix">Netflix</button>
                 <button class="btn-platform" data-id="337" data-name="Disney+">Disney+</button>
                 <button class="btn-platform" data-id="119" data-name="Prime Video">Prime Video</button>
                 <button class="btn-platform" data-id="1899" data-name="Max">Max</button>
             </div>
-
             <div class="random-zone">
-                <button id="btn-random" class="btn-special">
-                    <i class="fa-solid fa-shuffle"></i> ¡Sorpréndeme!
-                </button>
+                <button id="btn-random" class="btn-special"><i class="fa-solid fa-shuffle"></i> ¡Sorpréndeme!</button>
             </div>
         </nav>
 
@@ -57,30 +54,24 @@
                 <h2>Tu Recomendación</h2>
                 <button class="btn-outline btn-volver"><i class="fa-solid fa-arrow-left"></i> Volver</button>
             </div>
-
             <div class="random-split-layout">
                 <div class="random-showcase" id="random-showcase-container">
                     <div class="empty-state"><h3>Buscando algo épico...</h3></div>
                 </div>
-
                 <aside class="random-sidebar">
                     <h3><i class="fa-solid fa-compass"></i> Sigue explorando</h3>
-                    <p class="sidebar-desc">Filtra nuestro catálogo y encuentra exactamente lo que buscas.</p>
-                    
                     <div class="filter-form">
                         <div class="filter-group">
-                            <label for="genre-select">Género:</label>
-                            <select id="genre-select">
-                                <option value="">Todos los géneros</option>
-                            </select>
+                            <label>Género:</label>
+                            <select id="genre-select"><option value="">Todos los géneros</option></select>
                         </div>
                         <div class="filter-group">
-                            <label for="year-start">Año desde:</label>
-                            <input type="number" id="year-start" placeholder="Ej: 1990" min="1900" max="2026">
+                            <label>Año desde:</label>
+                            <input type="number" id="year-start" placeholder="Ej: 1990">
                         </div>
                         <div class="filter-group">
-                            <label for="year-end">Año hasta:</label>
-                            <input type="number" id="year-end" placeholder="Ej: 2026" min="1900" max="2026">
+                            <label>Año hasta:</label>
+                            <input type="number" id="year-end" placeholder="Ej: 2026">
                         </div>
                         <button id="btn-aplicar-filtros" class="btn-sidebar-filter"><i class="fa-solid fa-filter"></i> Generar Lista</button>
                     </div>
@@ -93,15 +84,11 @@
                 <h2 id="view-title">Resultados</h2>
                 <button class="btn-outline btn-volver"><i class="fa-solid fa-arrow-left"></i> Volver</button>
             </div>
-
-            <div id="results-container" aria-live="polite">
-                </div>
+            <div id="results-container" aria-live="polite"></div>
         </section>
     </main>
 
-    <footer>
-        <p>Datos proporcionados por la API de <span>TMDB</span></p>
-    </footer>
+    <footer><p>Datos proporcionados por la API de <span>TMDB</span></p></footer>
 
     <script src="script.js"></script>
 </body>
