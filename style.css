@@ -59,9 +59,10 @@ main { flex-grow: 1; max-width: 1200px; margin: 0 auto; width: 100%; }
 /* ==========================================================================
     EFECTO SLIDER Y PESTAÑAS
    ========================================================================== */
-.tab-container { display: flex; gap: 10px; background: var(--bg-card); padding: 5px; border-radius: var(--radius); width: fit-content; }
-.tab-btn { padding: 10px 25px; cursor: pointer; border: none; background: transparent; color: var(--text-muted); font-weight: 600; border-radius: 6px; transition: var(--transition); }
-.tab-btn.active { background-color: #0ea5e9; color: white; }
+.tab-container { display: flex; gap: 10px; margin-bottom: 20px; }
+.tab-btn { padding: 10px 25px; cursor: pointer; border: none; background: var(--bg-card); color: var(--text-muted); font-weight: 600; border-radius: 6px; transition: var(--transition); }
+.tab-btn.active { background-color: #0ea5e9; color: white; border-bottom: 2px solid #0ea5e9; }
+
 .slider-container { width: 100%; overflow: hidden; }
 .slider-track { display: flex; width: 200%; transition: transform 0.4s ease-in-out; }
 .slider-page { width: 100%; display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 30px; padding: 20px 0; }
