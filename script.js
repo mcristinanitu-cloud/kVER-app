@@ -115,15 +115,23 @@ async function cargarHero() {
 }
 
 async function cargarPorPlataforma(providerId) {
+    // Limpiamos los contenedores antes de cargar
+    document.getElementById('results-movie').innerHTML = '<h3>Cargando películas...</h3>';
+    document.getElementById('results-tv').innerHTML = '<h3>Cargando series...</h3>';
+
     try {
-        // Obtenemos los datos
-        const res = await fetch(`${BASE_URL}/discover/movie?api_key=${API_KEY}&language=es-ES&watch_region=ES&with_watch_providers=${providerId}&sort_by=popularity.desc`);
-        const data = await res.json();
-        
-        const itemsConTipo = data.results.map(i => ({...i, media_type: 'movie'}));
-        const resultadosFiltrados = limpiarResultados(itemsConTipo);
-        
-        pintarResultados(resultadosFiltrados.slice(0, 10), true); 
+        // Llamada para películas
+        const resMovie = await fetch(`${BASE_URL}/discover/movie?api_key=${API_KEY}&language=es-ES&watch_region=ES&with_watch_providers=${providerId}&sort_by=popularity.desc`);
+        const dataMovie = await resMovie.json();
+        const pelis = limpiarResultados(dataMovie.results.map(i => ({...i, media_type: 'movie'})));
+        pintarResultados(pelis.slice(0, 10), true, 'movie');
+
+        // Llamada para series
+        const resTv = await fetch(`${BASE_URL}/discover/tv?api_key=${API_KEY}&language=es-ES&watch_region=ES&with_watch_providers=${providerId}&sort_by=popularity.desc`);
+        const dataTv = await resTv.json();
+        const series = limpiarResultados(dataTv.results.map(i => ({...i, media_type: 'tv'})));
+        pintarResultados(series.slice(0, 10), true, 'tv');
+
     } catch (error) {
         mostrarError();
     }
@@ -133,20 +141,33 @@ async function ejecutarBusqueda() {
     const query = document.getElementById('search-input').value.trim();
     if (!query) return;
     mostrarVistaExplorador(`Resultados para: "${query}"`);
+    
+    // Limpiamos contenedores
+    document.getElementById('results-movie').innerHTML = '<h3>Cargando...</h3>';
+    document.getElementById('results-tv').innerHTML = '<h3>Cargando...</h3>';
+
     try {
-        const res = await fetch(`${BASE_URL}/search/multi?api_key=${API_KEY}&language=es-ES&query=${encodeURIComponent(query)}`);
-        const data = await res.json();
-        const resultadosFiltrados = limpiarResultados(data.results);
-        pintarResultados(resultadosFiltrados, false);
+        // Películas
+        const resM = await fetch(`${BASE_URL}/search/movie?api_key=${API_KEY}&language=es-ES&query=${encodeURIComponent(query)}`);
+        const dataM = await resM.json();
+        pintarResultados(limpiarResultados(dataM.results), false, 'movie');
+
+        // Series
+        const resT = await fetch(`${BASE_URL}/search/tv?api_key=${API_KEY}&language=es-ES&query=${encodeURIComponent(query)}`);
+        const dataT = await resT.json();
+        pintarResultados(limpiarResultados(dataT.results), false, 'tv');
     } catch (error) { mostrarError(); }
 }
 
 // 5. RENDERIZADO Y FILTROS
 // 5. RENDERIZADO Y FILTROS
-function pintarResultados(items, mostrarMedallaTop = false) {
-    resultsContainer.innerHTML = ''; 
+// MODIFICACIÓN: Ahora recibe el tipo para saber dónde pintar
+function pintarResultados(items, mostrarMedallaTop = false, tipoPintar = 'movie') {
+    const contenedor = document.getElementById(`results-${tipoPintar}`);
+    contenedor.innerHTML = ''; 
+    
     if (items.length === 0) {
-        resultsContainer.innerHTML = '<div class="empty-state"><h3>No hay resultados</h3></div>';
+        contenedor.innerHTML = '<div class="empty-state"><h3>No hay resultados</h3></div>';
         return;
     }
 
@@ -159,11 +180,8 @@ function pintarResultados(items, mostrarMedallaTop = false) {
         card.classList.add('movie-card');
         card.style.cursor = 'pointer'; 
         
-        // CORRECCIÓN: Evento de clic único y bien posicionado
         card.addEventListener('click', () => {
-            const tipoUrl = item.media_type || 'movie'; 
-            const url = `https://www.themoviedb.org/${tipoUrl}/${item.id}`;
-            window.open(url, '_blank');
+            window.open(`https://www.themoviedb.org/${item.media_type}/${item.id}`, '_blank');
         });
 
         card.innerHTML = `
@@ -174,24 +192,17 @@ function pintarResultados(items, mostrarMedallaTop = false) {
                 <p>${item.overview ? item.overview.substring(0, 100) + '...' : "Sin descripción."}</p>
             </div>
         `;
-        resultsContainer.appendChild(card);
-    });
+        contenedor.appendChild(card);
+    }); // <--- ¡ESTA LLAVE CERRABA EL FOREACH!
 }
-
 
 function limpiarResultados(items) {
     return items.filter(item => {
-        // Aseguramos que tenga nombre/título
         const tieneTitulo = item.title || item.name;
-        
-        // Si no tiene media_type, intentamos deducirlo
         if (!item.media_type) {
             item.media_type = item.title ? 'movie' : 'tv';
         }
-
-        // Solo validamos que sea película o serie y tenga título
         const esValido = (item.media_type === 'movie' || item.media_type === 'tv');
-        
         return esValido && tieneTitulo;
     });
 }
@@ -209,6 +220,31 @@ botonesPlataformas.forEach(boton => {
         }
     });
 });
+
+// Ejemplo para una búsqueda que llene ambos lados del slider
+async function buscarConDesplazamiento(query) {
+    // 1. Buscas pelis
+    const resMovie = await fetch(`${BASE_URL}/search/movie?api_key=${API_KEY}&query=${query}`);
+    const dataMovie = await resMovie.json();
+    pintarResultados(limpiarResultados(dataMovie.results), false, 'movie');
+
+    // 2. Buscas series
+    const resTv = await fetch(`${BASE_URL}/search/tv?api_key=${API_KEY}&query=${query}`);
+    const dataTv = await res.json();
+    pintarResultados(limpiarResultados(dataTv.results), false, 'tv');
+}
+
+function cambiarPestaña(tipo) {
+    const track = document.getElementById('slider-track');
+    const botones = document.querySelectorAll('.tab-btn');
+    
+    track.style.transform = tipo === 'movie' ? 'translateX(0%)' : 'translateX(-50%)';
+    
+    botones.forEach(b => {
+        // Esto compara el atributo 'data-type' que pusimos en el HTML
+        b.classList.toggle('active', b.getAttribute('data-type') === tipo);
+    });
+}
 
 // Eventos finales
 document.getElementById('btn-top-global').addEventListener('click', cargarTopGlobal);
