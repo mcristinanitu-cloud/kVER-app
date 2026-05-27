@@ -165,12 +165,9 @@ async function ejecutarBusqueda() {
 }
 
 // 5. RENDERIZADO Y FILTROS
-// 5. RENDERIZADO Y FILTROS
-// MODIFICACIÓN: Ahora recibe el tipo para saber dónde pintar
-// 5. RENDERIZADO Y FILTROS
 function pintarResultados(items, mostrarMedallaTop = false, tipoPintar = 'movie') {
     const contenedor = document.getElementById(`results-${tipoPintar}`);
-    if (!contenedor) return; // Seguridad extra
+    if (!contenedor) return; 
     
     contenedor.innerHTML = ''; 
     
@@ -201,8 +198,8 @@ function pintarResultados(items, mostrarMedallaTop = false, tipoPintar = 'movie'
             </div>
         `;
         contenedor.appendChild(card);
-    }); 
-} // <--- ¡AQUÍ CERRAMOS PINTARRESULTADOS!
+    });
+}
 
 function limpiarResultados(items) {
     if (!items) return [];
@@ -215,16 +212,15 @@ function limpiarResultados(items) {
     });
 }
 
-function limpiarResultados(items) {
-    if (!items) return [];
-    return items.filter(item => {
-        // Aseguramos que tenga título
-        const tieneTitulo = item.title || item.name;
-        // Asignamos tipo si falta
-        if (!item.media_type) {
-            item.media_type = item.title ? 'movie' : 'tv';
-        }
-        return tieneTitulo; // Quitamos el filtro estricto de esValido para ver qué llega
+// Lógica de pestañas y eventos
+function cambiarPestaña(tipo) {
+    const track = document.getElementById('slider-track');
+    const botones = document.querySelectorAll('.tab-btn');
+    
+    track.style.transform = tipo === 'movie' ? 'translateX(0%)' : 'translateX(-50%)';
+    
+    botones.forEach(b => {
+        b.classList.toggle('active', b.getAttribute('data-type') === tipo);
     });
 }
 
@@ -233,8 +229,6 @@ botonesPlataformas.forEach(boton => {
     boton.addEventListener('click', (e) => {
         const id = e.target.getAttribute('data-id');
         const nombre = e.target.getAttribute('data-name');
-        
-        // Ignoramos el botón de Top Global porque ese tiene su propio evento
         if (id) {
             mostrarVistaExplorador(`Top 10 en ${nombre}`);
             cargarPorPlataforma(id);
@@ -242,33 +236,6 @@ botonesPlataformas.forEach(boton => {
     });
 });
 
-// Ejemplo para una búsqueda que llene ambos lados del slider
-async function buscarConDesplazamiento(query) {
-    // 1. Buscas pelis
-    const resMovie = await fetch(`${BASE_URL}/search/movie?api_key=${API_KEY}&query=${query}`);
-    const dataMovie = await resMovie.json();
-    pintarResultados(limpiarResultados(dataMovie.results), false, 'movie');
-
-    // 2. Buscas series
-    const resTv = await fetch(`${BASE_URL}/search/tv?api_key=${API_KEY}&query=${query}`);
-    const dataTv = await res.json();
-    pintarResultados(limpiarResultados(dataTv.results), false, 'tv');
-}
-
-function cambiarPestaña(tipo) {
-    const track = document.getElementById('slider-track');
-    const botones = document.querySelectorAll('.tab-btn');
-    
-    track.style.transform = tipo === 'movie' ? 'translateX(0%)' : 'translateX(-50%)';
-    
-    botones.forEach(b => {
-        // Esto compara el atributo 'data-type' que pusimos en el HTML
-        b.classList.toggle('active', b.getAttribute('data-type') === tipo);
-    });
-}
-
-// Eventos finales
 document.getElementById('btn-top-global').addEventListener('click', cargarTopGlobal);
 document.getElementById('btn-random').addEventListener('click', () => { mostrarVistaRandom(); cargarRandom(); });
 document.getElementById('search-btn').addEventListener('click', ejecutarBusqueda);
-
