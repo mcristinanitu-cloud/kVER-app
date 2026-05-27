@@ -118,9 +118,15 @@ async function cargarPorPlataforma(providerId) {
     try {
         const res = await fetch(`${BASE_URL}/discover/movie?api_key=${API_KEY}&language=es-ES&watch_region=ES&with_watch_providers=${providerId}&sort_by=popularity.desc`);
         const data = await res.json();
-        const resultadosFiltrados = limpiarResultados(data.results.map(i => ({...i, media_type: 'movie'})));
+        
+        // Forzamos el media_type: 'movie' antes de limpiar
+        const itemsConTipo = data.results.map(i => ({...i, media_type: 'movie'}));
+        const resultadosFiltrados = limpiarResultados(itemsConTipo);
+        
         pintarResultados(resultadosFiltrados.slice(0, 10), true); 
-    } catch (error) { mostrarError(); }
+    } catch (error) {
+        mostrarError();
+    }
 }
 
 async function ejecutarBusqueda() {
@@ -142,24 +148,34 @@ function pintarResultados(items, mostrarMedallaTop = false) {
         resultsContainer.innerHTML = '<div class="empty-state"><h3>No hay resultados</h3></div>';
         return;
     }
+
     items.forEach((item, index) => {
         const poster = item.poster_path ? `${IMG_URL}${item.poster_path}` : 'https://via.placeholder.com/500x750?text=Sin+Poster';
         const titulo = item.title || item.name; 
         const tipo = item.media_type === 'tv' ? 'Serie' : 'Película';
+        
         const card = document.createElement('div');
         card.classList.add('movie-card');
+        // Añadimos cursor pointer para indicar que es clicable
+        card.style.cursor = 'pointer'; 
+        
+        // Evento de clic: redirige a la web de TMDB con el tipo e ID correctos
+        card.addEventListener('click', () => {
+            const url = `https://www.themoviedb.org/${item.media_type}/${item.id}`;
+            window.open(url, '_blank');
+        });
+
         card.innerHTML = `
             ${mostrarMedallaTop ? `<div class="rank-badge">${index + 1}</div>` : ''}
             <img src="${poster}" alt="${titulo}">
             <div class="movie-info">
                 <h3>${titulo} <small style="display:block; font-size: 0.8rem; color: #888;">${tipo}</small></h3>
-                <p>${item.overview || "Sin descripción."}</p>
+                <p>${item.overview ? item.overview.substring(0, 100) + '...' : "Sin descripción."}</p>
             </div>
         `;
         resultsContainer.appendChild(card);
     });
 }
-
 function limpiarResultados(items) {
     return items.filter(item => {
         // Aseguramos que tenga nombre/título
