@@ -53,7 +53,12 @@ async function cargarTopGlobal() {
     try {
         const res = await fetch(`${BASE_URL}/trending/all/day?api_key=${API_KEY}&language=es-ES`);
         const data = await res.json();
+        
+        console.log("Datos crudos:", data.results); // <--- MIRA LA CONSOLA (F12)
+        
         const resultadosFiltrados = limpiarResultados(data.results);
+        console.log("Después de limpiar:", resultadosFiltrados); // <--- MIRA LA CONSOLA
+        
         pintarResultados(resultadosFiltrados.slice(0, 10), true); 
     } catch (error) {
         mostrarError();
@@ -156,11 +161,16 @@ function pintarResultados(items, mostrarMedallaTop = false) {
 }
 
 function limpiarResultados(items) {
-    const idiomasPermitidos = ['es', 'en', 'fr', 'it', 'de', 'pt'];
+    // 1. Eliminamos el filtro estricto de idiomas (o hazlo más permisivo)
+    // 2. Nos aseguramos de que el elemento tenga al menos un título y un póster
     return items.filter(item => {
         const esValido = (item.media_type === 'movie' || item.media_type === 'tv');
-        const idiomaValido = idiomasPermitidos.includes(item.original_language);
-        return esValido && idiomaValido;
+        const tieneTitulo = item.title || item.name;
+        
+        // Si quieres filtrar idiomas, hazlo de forma opcional o mucho más amplia
+        // const idiomaValido = ['es', 'en', 'fr', 'it', 'de', 'pt'].includes(item.original_language);
+        
+        return esValido && tieneTitulo;
     });
 }
 
