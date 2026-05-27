@@ -82,15 +82,32 @@ async function cargarHero() {
 }
 
 async function cargarPorPlataforma(providerId) {
-    try {
-        const resM = await fetch(`${BASE_URL}/discover/movie?api_key=${API_KEY}&language=es-ES&watch_region=ES&with_watch_providers=${providerId}`);
-        const dataM = await resM.json();
-        pintarResultados(limpiarResultados(dataM.results.map(i=>({...i, media_type:'movie'}))), true, 'movie');
+    document.getElementById('results-movie').innerHTML = '<h3>Cargando películas...</h3>';
+    document.getElementById('results-tv').innerHTML = '<h3>Cargando series...</h3>';
 
-        const resT = await fetch(`${BASE_URL}/discover/tv?api_key=${API_KEY}&language=es-ES&watch_region=ES&with_watch_providers=${providerId}`);
-        const dataT = await resT.json();
-        pintarResultados(limpiarResultados(dataT.results.map(i=>({...i, media_type:'tv'}))), true, 'tv');
-    } catch (e) { console.error(e); }
+    // EL PARÁMETRO watch_region ES OBLIGATORIO PARA QUE FUNCIONEN LOS PROVIDERS
+    const urlBase = `${BASE_URL}/discover`;
+    const params = `api_key=${API_KEY}&language=es-ES&watch_region=ES&with_watch_providers=${providerId}&sort_by=popularity.desc`;
+
+    try {
+        const resMovie = await fetch(`${urlBase}/movie?${params}`);
+        const dataMovie = await resMovie.json();
+        // Si no hay resultados, imprimimos en consola para depurar
+        if (dataMovie.results.length === 0) console.warn("No hay pelis para este provider");
+        
+        const pelis = limpiarResultados(dataMovie.results.map(i => ({...i, media_type: 'movie'})));
+        pintarResultados(pelis.slice(0, 10), true, 'movie');
+
+        const resTv = await fetch(`${urlBase}/tv?${params}`);
+        const dataTv = await resTv.json();
+        if (dataTv.results.length === 0) console.warn("No hay series para este provider");
+
+        const series = limpiarResultados(dataTv.results.map(i => ({...i, media_type: 'tv'})));
+        pintarResultados(series.slice(0, 10), true, 'tv');
+
+    } catch (error) {
+        console.error("Error al cargar plataforma:", error);
+    }
 }
 
 async function ejecutarBusqueda() {
@@ -106,19 +123,34 @@ async function ejecutarBusqueda() {
 }
 
 // 5. RENDERIZADO
-function pintarResultados(items, showRank, tipo) {
-    const cont = document.getElementById(`results-${tipo}`);
-    cont.innerHTML = '';
-    items.forEach((item, i) => {
+function pintarResultados(items, mostrarMedallaTop = false, tipoPintar = 'movie') {
+    const contenedor = document.getElementById(`results-${tipoPintar}`);
+    if (!contenedor) return;
+    
+    contenedor.innerHTML = ''; 
+    
+    if (items.length === 0) {
+        contenedor.innerHTML = '<div class="empty-state"><h3>No hay resultados</h3></div>';
+        return;
+    }
+
+    items.forEach((item, index) => {
+        const poster = item.poster_path ? `${IMG_URL}${item.poster_path}` : 'https://via.placeholder.com/500x750?text=Sin+Poster';
+        const titulo = item.title || item.name;
+        
         const card = document.createElement('div');
-        card.className = 'movie-card';
-        card.onclick = () => window.open(`https://www.themoviedb.org/${item.media_type}/${item.id}`, '_blank');
+        card.classList.add('movie-card');
+        card.onclick = () => window.open(`https://www.themoviedb.org/${item.media_type || tipoPintar}/${item.id}`, '_blank');
+        
         card.innerHTML = `
-            ${showRank ? `<div class="rank-badge">${i + 1}</div>` : ''}
-            <img src="${item.poster_path ? IMG_URL+item.poster_path : 'https://via.placeholder.com/500x750'}">
-            <div class="movie-info"><h3>${item.title || item.name}</h3></div>
+            ${mostrarMedallaTop ? `<div class="rank-badge">${index + 1}</div>` : ''}
+            <img src="${poster}" alt="${titulo}">
+            <div class="movie-info">
+                <h3>${titulo}</h3>
+                <p>${item.overview ? item.overview.substring(0, 100) + '...' : "Sin descripción."}</p>
+            </div>
         `;
-        cont.appendChild(card);
+        contenedor.appendChild(card);
     });
 }
 
