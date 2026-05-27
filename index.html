@@ -9,13 +9,16 @@
 </head>
 <body>
 
-    <header id="main-header">
+  <header id="main-header">
         <div class="logo-container" id="logo" style="cursor: pointer;">
             <h1>kVER <span>España</span></h1>
         </div>
         
         <div class="search-container">
-            <input type="text" id="search-input" placeholder="Buscar película o serie...">
+            <div style="position: relative; width: 100%;">
+                <input type="text" id="search-input" placeholder="Buscar película o serie..." autocomplete="off">
+                <div id="search-suggestions" class="suggestions-box hidden"></div>
+            </div>
             <button id="search-btn" aria-label="Buscar"><i class="fa-solid fa-magnifying-glass"></i></button>
         </div>
     </header>

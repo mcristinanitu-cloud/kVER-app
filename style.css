@@ -44,6 +44,64 @@ button { font-family: var(--font-sans); font-weight: 600; font-size: 0.95rem; pa
 .btn-special:hover { transform: translateY(-3px) scale(1.05); background: linear-gradient(45deg, #7928ca, #ff007a); }
 @keyframes pulse-glow { 0% { box-shadow: 0 0 0 0 rgba(121, 40, 202, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(121, 40, 202, 0); } 100% { box-shadow: 0 0 0 0 rgba(121, 40, 202, 0); } }
 
+
+/* ==========================================================================
+   CAJA DE SUGERENCIAS DEL BUSCADOR (NUEVO)
+   ========================================================================== */
+.suggestions-box {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background-color: var(--bg-card);
+    border: 1px solid #334155;
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    z-index: 2000;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.suggestion-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 15px;
+    cursor: pointer;
+    border-bottom: 1px solid #334155;
+    transition: var(--transition);
+}
+
+.suggestion-item:last-child {
+    border-bottom: none;
+}
+
+.suggestion-item:hover {
+    background-color: var(--bg-accent);
+}
+
+.suggestion-item img {
+    width: 40px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+.suggestion-info h4 {
+    font-size: 0.9rem;
+    color: var(--text-main);
+    margin: 0 0 5px 0;
+}
+
+.suggestion-info span {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background-color: var(--bg-main);
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
 /* ==========================================================================
    VISTAS Y CABECERAS
    ========================================================================== */
@@ -124,3 +182,5 @@ footer span { color: #0ea5e9; font-weight: bold; }
     .platform-buttons { display: grid; grid-template-columns: 1fr 1fr; }
     .random-zone button { width: 100%; }
 }
+
+
