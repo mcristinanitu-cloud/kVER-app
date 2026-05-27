@@ -1,8 +1,8 @@
 :root {
-    --bg-main: #0f172a;       
-    --bg-card: #1e293b;       
-    --bg-accent: #334155;     
-    --text-main: #f8fafc;     
+    --bg-main: #0f172a;        
+    --bg-card: #1e293b;        
+    --bg-accent: #334155;      
+    --text-main: #f8fafc;      
     --text-muted: #94a3b8;    
     --font-sans: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
     --radius: 12px;
@@ -18,7 +18,7 @@ body {
 .hidden { display: none !important; }
 
 /* ==========================================================================
-   HEADER FIJO Y SELECTORES
+    HEADER FIJO Y SELECTORES
    ========================================================================== */
 header#main-header { position: fixed; top: 0; left: 0; right: 0; display: flex; justify-content: space-between; align-items: center; padding: 15px 40px; background-color: rgba(15, 23, 42, 0.95); backdrop-filter: blur(10px); z-index: 1000; box-shadow: 0 4px 20px rgba(0,0,0,0.4); border-bottom: 1px solid var(--bg-card); }
 header h1 { font-size: 2rem; font-weight: 800; letter-spacing: -1px; }
@@ -40,76 +40,46 @@ button { font-family: var(--font-sans); font-weight: 600; font-size: 0.95rem; pa
 .btn-platform[data-id="119"]:hover { border-color: #00a8e1; color: #00a8e1; }
 .btn-platform[data-id="1899"]:hover { border-color: #7000ff; color: #9d4edd; }
 
+.btn-global { background-color: var(--bg-main); color: var(--text-main); border-color: #e50914; }
+.btn-global:hover { background-color: #e50914; color: white; }
+
 .btn-special { background: linear-gradient(45deg, #ff007a, #7928ca); color: white; border: none; box-shadow: 0 4px 15px rgba(121, 40, 202, 0.4); animation: pulse-glow 2s infinite; }
 .btn-special:hover { transform: translateY(-3px) scale(1.05); background: linear-gradient(45deg, #7928ca, #ff007a); }
 @keyframes pulse-glow { 0% { box-shadow: 0 0 0 0 rgba(121, 40, 202, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(121, 40, 202, 0); } 100% { box-shadow: 0 0 0 0 rgba(121, 40, 202, 0); } }
 
-
 /* ==========================================================================
-   CAJA DE SUGERENCIAS DEL BUSCADOR (NUEVO)
-   ========================================================================== */
-.suggestions-box {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    width: 100%;
-    background-color: var(--bg-card);
-    border: 1px solid #334155;
-    border-top: none;
-    border-radius: 0 0 8px 8px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-    z-index: 2000;
-    max-height: 300px;
-    overflow-y: auto;
-}
-
-.suggestion-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 10px 15px;
-    cursor: pointer;
-    border-bottom: 1px solid #334155;
-    transition: var(--transition);
-}
-
-.suggestion-item:last-child {
-    border-bottom: none;
-}
-
-.suggestion-item:hover {
-    background-color: var(--bg-accent);
-}
-
-.suggestion-item img {
-    width: 40px;
-    height: 60px;
-    object-fit: cover;
-    border-radius: 4px;
-}
-
-.suggestion-info h4 {
-    font-size: 0.9rem;
-    color: var(--text-main);
-    margin: 0 0 5px 0;
-}
-
-.suggestion-info span {
-    font-size: 0.75rem;
-    color: var(--text-muted);
-    background-color: var(--bg-main);
-    padding: 2px 6px;
-    border-radius: 4px;
-}
-
-/* ==========================================================================
-   VISTAS Y CABECERAS
+    VISTAS Y CABECERAS
    ========================================================================== */
 main { flex-grow: 1; max-width: 1200px; margin: 0 auto; width: 100%; }
-.view-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid var(--bg-card); padding-bottom: 15px; }
+.view-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid var(--bg-card); padding-bottom: 15px; flex-wrap: wrap; }
 .view-header h2 { font-size: 2rem; color: var(--text-main); }
 .btn-outline { background: transparent; border: 1px solid #475569; color: var(--text-main); padding: 8px 16px; }
 .btn-outline:hover { background: var(--bg-card); }
+
+/* ==========================================================================
+    EFECTO SLIDER Y PESTAÑAS
+   ========================================================================== */
+.tab-container { display: flex; gap: 10px; background: var(--bg-card); padding: 5px; border-radius: var(--radius); width: fit-content; }
+.tab-btn { padding: 10px 25px; cursor: pointer; border: none; background: transparent; color: var(--text-muted); font-weight: 600; border-radius: 6px; transition: var(--transition); }
+.tab-btn.active { background-color: #0ea5e9; color: white; }
+.slider-container { width: 100%; overflow: hidden; }
+.slider-track { display: flex; width: 200%; transition: transform 0.4s ease-in-out; }
+.slider-page { width: 100%; display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 30px; padding: 20px 0; }
+
+/* ==========================================================================
+    COMPONENTES DE PELÍCULA
+   ========================================================================== */
+.movie-card { position: relative; background-color: var(--bg-card); border-radius: var(--radius); overflow: hidden; transition: var(--transition); box-shadow: 0 4px 6px rgba(0,0,0,0.1); display: flex; flex-direction: column; }
+.movie-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
+.movie-card img { width: 100%; height: 330px; object-fit: cover; }
+.movie-info { padding: 15px; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; }
+.movie-info h3 { font-size: 1.1rem; margin-bottom: 10px; }
+.movie-info p { font-size: 0.9rem; color: var(--text-muted); display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
+
+.rank-badge { position: absolute; top: -10px; left: -10px; background: linear-gradient(135deg, #e50914, #b20710); color: white; font-size: 1.5rem; font-weight: 900; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; border-radius: 50%; box-shadow: 0 4px 10px rgba(0,0,0,0.5); border: 3px solid var(--bg-card); z-index: 10; }
+.empty-state { grid-column: 1 / -1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 80px 20px; background-color: rgba(30, 41, 59, 0.3); border: 2px dashed #334155; border-radius: var(--radius); text-align: center; width: 100%; }
+
+/* [Añade aquí el resto de tus estilos originales para .hero, .random-split-layout, etc.] */
 
 /* ==========================================================================
    VISTA 1: HERO
