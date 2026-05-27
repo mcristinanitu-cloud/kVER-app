@@ -30,7 +30,7 @@
                 <button class="btn-platform" data-id="337" data-name="Disney+">Disney+</button>
                 <button class="btn-platform" data-id="119" data-name="Prime Video">Prime Video</button>
                 <button class="btn-platform" data-id="1899" data-name="Max">Max</button>
-                <button class="btn-platform btn-global" id="btn-top-global" style="border: 1px solid #e50914;">Top Global</button>
+                <button class="btn-global" id="btn-top-global" style="border: 1px solid #e50914;">Top Global</button>
             </div>
 
             <div class="random-zone">
@@ -92,11 +92,21 @@
         <section id="explore-section" class="hidden">
             <div class="view-header">
                 <h2 id="view-title">Resultados</h2>
+                
+                <div class="tab-container" style="display: flex; gap: 15px; margin-bottom: 10px;">
+                    <button class="tab-btn active" onclick="cambiarPestaña('movie')">Películas</button>
+                    <button class="tab-btn" onclick="cambiarPestaña('tv')">Series</button>
+                </div>
+
                 <button class="btn-outline btn-volver"><i class="fa-solid fa-arrow-left"></i> Volver</button>
             </div>
 
-            <div id="results-container" aria-live="polite">
+            <div class="slider-container" style="width: 100%; overflow: hidden;">
+                <div id="slider-track" class="slider-track" style="display: flex; width: 200%; transition: transform 0.4s ease-in-out;">
+                    <div id="results-movie" class="slider-page" style="width: 100%;"></div>
+                    <div id="results-tv" class="slider-page" style="width: 100%;"></div>
                 </div>
+            </div>
         </section>
     </main>
 
