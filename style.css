@@ -183,3 +183,10 @@ footer span { color: #0ea5e9; font-weight: bold; }
     .random-zone button { width: 100%; }
 }
 
+
+/* (Manten todo tu CSS anterior y añade esto al final) */
+.suggestions-box { position: absolute; top: 100%; left: 0; width: 100%; background: #1e293b; border: 1px solid #334155; border-radius: 0 0 8px 8px; z-index: 2000; max-height: 300px; overflow-y: auto; }
+.suggestion-item { display: flex; align-items: center; gap: 10px; padding: 10px; cursor: pointer; border-bottom: 1px solid #334155; }
+.suggestion-item:hover { background: #334155; }
+.suggestion-item img { width: 40px; height: 60px; object-fit: cover; border-radius: 4px; }
+.suggestion-item h4 { font-size: 0.9rem; }
