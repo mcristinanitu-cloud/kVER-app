@@ -1,84 +1,41 @@
 const API_KEY = 'fa3ef31ea0b78236a43a91a3b9af300c';
 const BASE_URL = 'https://api.themoviedb.org/3';
 const IMG_URL = 'https://image.tmdb.org/t/p/w500';
-const IMG_ORIGINAL = 'https://image.tmdb.org/t/p/original';
 
-// Inicialización
-document.addEventListener('DOMContentLoaded', () => { cargarHero(); cargarGeneros(); });
-
-// Navegación
-function mostrarVista(vista) {
-    document.getElementById('hero-section').classList.toggle('hidden', vista !== 'hero');
-    document.getElementById('random-section').classList.toggle('hidden', vista !== 'random');
-    document.getElementById('explore-section').classList.toggle('hidden', vista !== 'explore');
-}
-
-// Búsqueda y Sugerencias
 const searchInput = document.getElementById('search-input');
 const searchSuggestions = document.getElementById('search-suggestions');
 
+// Búsqueda en vivo (Sugerencias)
 searchInput.addEventListener('input', async (e) => {
     const query = e.target.value.trim();
     if (query.length < 3) { searchSuggestions.classList.add('hidden'); return; }
+    
     const res = await fetch(`${BASE_URL}/search/multi?api_key=${API_KEY}&language=es-ES&query=${encodeURIComponent(query)}`);
     const data = await res.json();
-    mostrarSugerencias(data.results.filter(i => i.media_type === 'movie' || i.media_type === 'tv').slice(0, 5));
-});
-
-function mostrarSugerencias(res) {
-    searchSuggestions.innerHTML = res.map(item => `
-        <div class="suggestion-item" onclick="ejecutarBusqueda('${item.title || item.name}')">
+    const resultados = data.results.filter(i => i.media_type === 'movie' || i.media_type === 'tv').slice(0, 5);
+    
+    searchSuggestions.innerHTML = resultados.map(item => `
+        <div class="suggestion-item" onclick="ejecutarBusquedaReal('${item.title || item.name}')">
             <img src="${item.poster_path ? IMG_URL + item.poster_path : ''}">
             <div><h4>${item.title || item.name}</h4><span>${item.media_type === 'tv' ? 'Serie' : 'Película'}</span></div>
         </div>`).join('');
     searchSuggestions.classList.remove('hidden');
-}
+});
 
-async function ejecutarBusqueda(query) {
-    if (!query) return;
-    mostrarVista('explore');
-    
-    // Cambiamos a search/multi y forzamos el idioma y que incluya adultos (por si acaso)
-    const url = `${BASE_URL}/search/multi?api_key=${API_KEY}&language=es-ES&query=${encodeURIComponent(query)}&include_adult=false`;
-    
-    try {
-        const res = await fetch(url);
-        const data = await res.json();
-        
-        // Filtramos resultados para solo mostrar cine o TV
-        const resultados = data.results.filter(i => i.media_type === 'movie' || i.media_type === 'tv');
-        
-        if (resultados.length === 0) {
-            document.getElementById('results-container').innerHTML = '<h3>No hemos encontrado nada con ese nombre</h3>';
-        } else {
-            pintarPeliculas(resultados);
-        }
-    } catch (error) {
-        console.error("Error en la búsqueda:", error);
-    }
-}
+// Función de búsqueda real (la que clicas)
+async function ejecutarBusquedaReal(query) {
+    document.getElementById('explore-section').classList.remove('hidden');
+    document.getElementById('hero-section').classList.add('hidden');
+    document.getElementById('random-section').classList.add('hidden');
+    searchSuggestions.classList.add('hidden');
+    searchInput.value = '';
 
-async function cargarHero() {
-    const res = await fetch(`${BASE_URL}/trending/movie/day?api_key=${API_KEY}&language=es-ES`);
+    const res = await fetch(`${BASE_URL}/search/multi?api_key=${API_KEY}&language=es-ES&query=${encodeURIComponent(query)}`);
     const data = await res.json();
-    const movie = data.results[0];
-    document.getElementById('hero-title').textContent = movie.title;
-    document.getElementById('hero-overview').textContent = movie.overview;
-    document.getElementById('hero-section').style.backgroundImage = `url(${IMG_ORIGINAL}${movie.backdrop_path})`;
+    pintarPeliculas(data.results.filter(i => i.media_type === 'movie' || i.media_type === 'tv'));
 }
 
-function pintarPeliculas(list, top = false) {
-    const cont = document.getElementById('results-container');
-    cont.innerHTML = list.map((p, i) => `
-        <div class="movie-card">
-            ${top ? `<div class="rank-badge">${i+1}</div>` : ''}
-            <img src="${p.poster_path ? IMG_URL + p.poster_path : ''}">
-            <div class="movie-info"><h3>${p.title || p.name}</h3></div>
-        </div>`).join('');
-}
+// Ocultar sugerencias al hacer clic fuera
+document.addEventListener('click', (e) => { if (!e.target.closest('.search-container')) searchSuggestions.classList.add('hidden'); });
 
-// Eventos
-document.getElementById('logo').onclick = () => mostrarVista('hero');
-document.querySelectorAll('.btn-volver').forEach(b => b.onclick = () => mostrarVista('hero'));
-document.getElementById('btn-random').onclick = () => { mostrarVista('random'); /* Añadir llamada a cargarRandom */ };
-document.getElementById('search-btn').onclick = () => ejecutarBusqueda(searchInput.value);
+// ... (Aquí mantén el resto de tus funciones: cargarHero, cargarRandom, pintarPeliculas, etc)
