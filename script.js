@@ -57,15 +57,66 @@ const botonesVolver = document.querySelectorAll('.btn-volver');
 botonesVolver.forEach(btn => btn.addEventListener('click', mostrarVistaPrincipal));
 
 // ==========================================================================
-// 4. BÚSQUEDA Y SUGERENCIAS EN VIVO (Películas y Series)
+// 4. BÚSQUEDA Y SUGERENCIAS (Películas y Series)
 // ==========================================================================
 const searchInput = document.getElementById('search-input');
 const searchSuggestions = document.getElementById('search-suggestions');
 let timeoutSugerencias;
 
-// Evento que se dispara cada vez que escribes una letra
 searchInput.addEventListener('input', (e) => {
-    clearTimeout(timeoutSugerencias); // Evita saturar la API (Debounce)
+    clearTimeout(timeoutSugerencias);
     const query = e.target.value.trim();
     
     if (query.length < 3) {
+        searchSuggestions.classList.add('hidden');
+        return;
+    }
+
+    // Usamos el endpoint 'multi' de la API para buscar pelis y series a la vez
+    timeoutSugerencias = setTimeout(async () => {
+        try {
+            const res = await fetch(`${BASE_URL}/search/multi?api_key=${API_KEY}&language=es-ES&query=${encodeURIComponent(query)}`);
+            const data = await res.json();
+            mostrarSugerencias(data.results.slice(0, 5)); // Mostramos solo los 5 mejores resultados
+        } catch (error) {
+            console.error("Error al buscar:", error);
+        }
+    }, 300);
+});
+
+function mostrarSugerencias(items) {
+    searchSuggestions.innerHTML = '';
+    
+    if (items.length === 0) {
+        searchSuggestions.innerHTML = '<div class="suggestion-item">No se encontraron resultados</div>';
+    } else {
+        items.forEach(item => {
+            // Solo nos interesan películas o series
+            if (item.media_type === 'movie' || item.media_type === 'tv') {
+                const title = item.title || item.name;
+                const poster = item.poster_path ? `${IMG_URL}${item.poster_path}` : 'placeholder.jpg';
+                const type = item.media_type === 'movie' ? 'Película' : 'Serie';
+                
+                const div = document.createElement('div');
+                div.className = 'suggestion-item';
+                div.innerHTML = `
+                    <img src="${poster}" alt="${title}">
+                    <div class="suggestion-info">
+                        <h4>${title}</h4>
+                        <span>${type}</span>
+                    </div>
+                `;
+                // Aquí podrías añadir un evento click para navegar al detalle
+                searchSuggestions.appendChild(div);
+            }
+        });
+    }
+    searchSuggestions.classList.remove('hidden');
+}
+
+// Cerrar sugerencias al hacer clic fuera
+document.addEventListener('click', (e) => {
+    if (!searchInput.contains(e.target)) {
+        searchSuggestions.classList.add('hidden');
+    }
+});
